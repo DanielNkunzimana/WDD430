@@ -1,9 +1,15 @@
-import NextAuth from 'next-auth';
-import { authConfig } from '../auth.config';
- 
-export default NextAuth(authConfig).auth;
- 
+import { auth } from "@/auth";
+import { NextResponse } from "next/server";
+
+export default auth((req) => {
+  const isLoggedIn = !!req.auth;
+  const { pathname } = req.nextUrl;
+
+  if (pathname.startsWith("/dashboard") && !isLoggedIn) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+});
+
 export const config = {
-  // https://nextjs.org/docs/app/api-reference/file-conventions/proxy#matcher
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  matcher: ["/dashboard/:path*"],
 };
